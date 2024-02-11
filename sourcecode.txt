@@ -1,0 +1,64 @@
+#include <dht.h>
+#include <LiquidCrystal.h>
+
+// Define the pins
+#define DHTPIN 2
+#define FAN_PIN 3
+
+// Define the DHT type
+#define DHTTYPE DHT11
+
+// Initialize the DHT sensor
+DHT dht(DHTPIN, DHTTYPE);
+
+// Initialize the LCD screen
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+void setup() {
+  // Start the serial communication
+  Serial.begin(9600);
+
+  // Initialize the DHT sensor
+  dht.begin();
+
+  // Initialize the LCD screen
+  lcd.init();
+  lcd.backlight();
+
+  // Set the fan pin as an output
+  pinMode(FAN_PIN, OUTPUT);
+
+  // Display the initial message on the LCD screen
+  lcd.setCursor(0, 0);
+  lcd.print("Temp:");
+  lcd.setCursor(0, 1);
+  lcd.print("Hum :");
+}
+
+void loop() {
+  // Read the temperature and humidity values
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+
+  // Display the values on the LCD screen
+  lcd.setCursor(5, 0);
+  lcd.print(temperature);
+  lcd.setCursor(10,0);
+  lcd.println("Degree");
+  lcd.setCursor(5, 1);
+  lcd.print(humidity);
+  lcd.setCursor(10,1);
+  lcd.println("%     ");
+
+  // Check if the temperature is too high
+  if (temperature > 35) {
+    // Turn on the fan
+    digitalWrite(FAN_PIN, HIGH);
+  } else {
+    // Turn off the fan
+    digitalWrite(FAN_PIN, LOW);
+  }
+
+  // Delay for 2 seconds
+  delay(2000);
+}
